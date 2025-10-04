@@ -6,11 +6,8 @@ async function main() {
   console.log("Start seeding...");
 
   // Create sample employees
-  const employee1 = await prisma.employee.upsert({
-    where: { empNo: "E001" },
-    update: {},
-    create: {
-      empNo: "E001",
+  const employee1 = await prisma.employee.create({
+    data: {
       name: "張小明",
       title: "店長",
       hourlyWage: 200,
@@ -18,22 +15,16 @@ async function main() {
     },
   });
 
-  const employee2 = await prisma.employee.upsert({
-    where: { empNo: "E002" },
-    update: {},
-    create: {
-      empNo: "E002",
+  const employee2 = await prisma.employee.create({
+    data: {
       name: "李小華",
       title: "正職員工",
       hourlyWage: 180,
     },
   });
 
-  const employee3 = await prisma.employee.upsert({
-    where: { empNo: "E003" },
-    update: {},
-    create: {
-      empNo: "E003",
+  const employee3 = await prisma.employee.create({
+    data: {
       name: "王小美",
       title: "兼職員工",
       hourlyWage: 170,

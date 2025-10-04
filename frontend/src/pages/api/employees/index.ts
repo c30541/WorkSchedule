@@ -8,7 +8,7 @@ export default async function handler(
   if (req.method === "GET") {
     try {
       const employees = await prisma.employee.findMany({
-        orderBy: { empNo: "asc" },
+        orderBy: { name: "asc" },
       });
       res.status(200).json(employees);
     } catch (error) {
@@ -17,15 +17,14 @@ export default async function handler(
     }
   } else if (req.method === "POST") {
     try {
-      const { empNo, name, title, hourlyWage, note, isActive } = req.body;
+      const { name, title, hourlyWage, note, isActive } = req.body;
 
-      if (!empNo || !name) {
-        return res.status(400).json({ error: "empNo and name are required" });
+      if (!name) {
+        return res.status(400).json({ error: "name is required" });
       }
 
       const employee = await prisma.employee.create({
         data: {
-          empNo,
           name,
           title,
           hourlyWage,
@@ -37,11 +36,7 @@ export default async function handler(
       res.status(201).json(employee);
     } catch (error: any) {
       console.error("Error creating employee:", error);
-      if (error.code === "P2002") {
-        res.status(400).json({ error: "Employee number already exists" });
-      } else {
-        res.status(500).json({ error: "Failed to create employee" });
-      }
+      res.status(500).json({ error: "Failed to create employee" });
     }
   } else {
     res.setHeader("Allow", ["GET", "POST"]);

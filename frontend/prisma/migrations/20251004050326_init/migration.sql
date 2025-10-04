@@ -1,7 +1,6 @@
 -- CreateTable
 CREATE TABLE "Employee" (
     "id" SERIAL NOT NULL,
-    "empNo" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "title" TEXT,
     "hourlyWage" DECIMAL(10,2),
@@ -26,9 +25,6 @@ CREATE TABLE "Shift" (
 
     CONSTRAINT "Shift_pkey" PRIMARY KEY ("id")
 );
-
--- CreateIndex
-CREATE UNIQUE INDEX "Employee_empNo_key" ON "Employee"("empNo");
 
 -- CreateIndex
 CREATE INDEX "Shift_date_idx" ON "Shift"("date");

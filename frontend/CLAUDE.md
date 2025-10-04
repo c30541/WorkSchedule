@@ -57,7 +57,6 @@ datasource db {
 
 model Employee {
   id        Int      @id @default(autoincrement())
-  empNo     String   @unique
   name      String
   title     String?
   hourlyWage Decimal?  @db.Decimal(10,2)

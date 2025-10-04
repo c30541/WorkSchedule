@@ -30,12 +30,11 @@ export default async function handler(
     }
   } else if (req.method === "PUT") {
     try {
-      const { empNo, name, title, hourlyWage, note, isActive } = req.body;
+      const { name, title, hourlyWage, note, isActive } = req.body;
 
       const employee = await prisma.employee.update({
         where: { id: employeeId },
         data: {
-          empNo,
           name,
           title,
           hourlyWage,
@@ -49,8 +48,6 @@ export default async function handler(
       console.error("Error updating employee:", error);
       if (error.code === "P2025") {
         res.status(404).json({ error: "Employee not found" });
-      } else if (error.code === "P2002") {
-        res.status(400).json({ error: "Employee number already exists" });
       } else {
         res.status(500).json({ error: "Failed to update employee" });
       }

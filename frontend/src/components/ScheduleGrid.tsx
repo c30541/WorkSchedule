@@ -2,12 +2,11 @@
 
 import { formatDate, formatTimeRange } from "@/lib/utils";
 import { useCallback, useEffect, useState } from "react";
-import ShiftCell from "./ShiftCell";
 import * as XLSX from "xlsx";
+import ShiftCell from "./ShiftCell";
 
 interface Employee {
   id: number;
-  empNo: string;
   name: string;
   isActive?: boolean;
 }
@@ -197,7 +196,10 @@ export default function ScheduleGrid({
     const activeEmployees = employees.filter((emp) => emp.isActive !== false);
 
     // 準備表頭
-    const headers = ["員工", ...dates.map((date) => `${date.getMonth() + 1}/${date.getDate()}`)];
+    const headers = [
+      "員工",
+      ...dates.map((date) => `${date.getMonth() + 1}/${date.getDate()}`),
+    ];
 
     // 準備資料
     const data = activeEmployees.map((employee) => {
@@ -329,13 +331,17 @@ export default function ScheduleGrid({
                     return (
                       <tr key={employee.id}>
                         <td className="text-center">{employee.name}</td>
-                        <td className="text-center fw-semibold">{totalHours.toFixed(1)} 小時</td>
+                        <td className="text-center fw-semibold">
+                          {totalHours.toFixed(1)} 小時
+                        </td>
                       </tr>
                     );
                   })}
                 <tr className="table-info">
                   <td className="text-center fw-bold">總計</td>
-                  <td className="text-center fw-bold">{calculateGrandTotal().toFixed(1)} 小時</td>
+                  <td className="text-center fw-bold">
+                    {calculateGrandTotal().toFixed(1)} 小時
+                  </td>
                 </tr>
               </tbody>
             </table>

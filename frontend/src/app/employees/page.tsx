@@ -5,7 +5,6 @@ import Link from "next/link";
 
 interface Employee {
   id: number;
-  empNo: string;
   name: string;
   title?: string;
   hourlyWage?: number;
@@ -19,7 +18,6 @@ export default function EmployeesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
   const [formData, setFormData] = useState({
-    empNo: "",
     name: "",
     title: "",
     hourlyWage: "",
@@ -41,7 +39,6 @@ export default function EmployeesPage() {
     e.preventDefault();
 
     const payload = {
-      empNo: formData.empNo,
       name: formData.name,
       title: formData.title || null,
       hourlyWage: formData.hourlyWage ? parseFloat(formData.hourlyWage) : null,
@@ -65,14 +62,13 @@ export default function EmployeesPage() {
 
     setIsModalOpen(false);
     setEditingEmployee(null);
-    setFormData({ empNo: "", name: "", title: "", hourlyWage: "", note: "", isActive: true });
+    setFormData({ name: "", title: "", hourlyWage: "", note: "", isActive: true });
     fetchEmployees();
   };
 
   const handleEdit = (employee: Employee) => {
     setEditingEmployee(employee);
     setFormData({
-      empNo: employee.empNo,
       name: employee.name,
       title: employee.title || "",
       hourlyWage: employee.hourlyWage?.toString() || "",
@@ -91,7 +87,7 @@ export default function EmployeesPage() {
 
   const openCreateModal = () => {
     setEditingEmployee(null);
-    setFormData({ empNo: "", name: "", title: "", hourlyWage: "", note: "", isActive: true });
+    setFormData({ name: "", title: "", hourlyWage: "", note: "", isActive: true });
     setIsModalOpen(true);
   };
 
@@ -161,7 +157,6 @@ export default function EmployeesPage() {
             <table className="table table-hover mb-0 align-middle">
               <thead className="table-light">
                 <tr>
-                  <th className="text-center">員工編號</th>
                   <th className="text-center">姓名</th>
                   <th className="text-center">職稱</th>
                   <th className="text-center">時薪</th>
@@ -173,7 +168,6 @@ export default function EmployeesPage() {
               <tbody>
                 {filteredEmployees.map((emp) => (
                   <tr key={emp.id}>
-                    <td className="text-center">{emp.empNo}</td>
                     <td className="text-center">{emp.name}</td>
                     <td className="text-center">{emp.title || "-"}</td>
                     <td className="text-center">{emp.hourlyWage ? `$${emp.hourlyWage}` : "-"}</td>
@@ -222,18 +216,6 @@ export default function EmployeesPage() {
                 </div>
                 <form onSubmit={handleSubmit}>
                   <div className="modal-body">
-                    <div className="mb-3">
-                      <label className="form-label">員工編號 *</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        value={formData.empNo}
-                        onChange={(e) =>
-                          setFormData({ ...formData, empNo: e.target.value })
-                        }
-                        required
-                      />
-                    </div>
                     <div className="mb-3">
                       <label className="form-label">姓名 *</label>
                       <input
