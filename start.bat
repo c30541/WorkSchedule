@@ -38,7 +38,7 @@ echo.
 echo [3/3] 啟動服務...
 echo 正在啟動資料庫和應用程式，請稍候...
 echo.
-docker-compose up -d
+docker-compose up --build -d
 
 if %errorlevel% neq 0 (
     echo.
