@@ -294,6 +294,27 @@ docker-compose restart
 docker-compose up -d --build
 ```
 
+### 更新程式
+
+當專案有程式更新時，建議執行以下步驟以確保完整更新：
+
+**Windows 使用者：**
+1. 雙擊執行 `clean-docker.bat`
+2. 確認刪除提示後輸入 `Y`
+3. 等待清理完成
+4. 雙擊執行 `start.bat` 重新啟動服務
+
+**macOS / Linux 使用者：**
+```bash
+# 停止並刪除容器、映像、卷
+docker-compose down -v
+docker rmi $(docker images -q)
+docker volume prune -f
+
+# 重新啟動服務
+docker-compose up -d --build
+```
+
 ### 資料庫操作
 
 ```bash
