@@ -1,0 +1,41 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Employee {
+  id         Int      @id @default(autoincrement())
+  empNo      String   @unique
+  name       String
+  title      String?
+  hourlyWage Decimal? @db.Decimal(10, 2)
+  note       String?
+  isActive   Boolean  @default(true) // 在職狀態
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  shifts     Shift[]
+}
+
+model Shift {
+  id         Int      @id @default(autoincrement())
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  employeeId Int
+  date       String   // Format: YYYYMMDD (e.g., "20250101")
+  startTime  Int      // 24h format (e.g., 800 for 08:00, 1330 for 13:30)
+  endTime    Int      // 24h format
+  duration   Float    // Hours (e.g., 7.5)
+  note       String?
+  isLeave    Boolean  @default(false) // 是否為休假
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([date])
+  @@index([employeeId])
+}

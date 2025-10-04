@@ -1,0 +1,52 @@
+{
+  "name": "workschedule",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "prisma db seed"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/c30541/WorkSchedule.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/c30541/WorkSchedule/issues"
+  },
+  "homepage": "https://github.com/c30541/WorkSchedule#readme",
+  "dependencies": {
+    "@prisma/client": "^6.16.3",
+    "@types/node": "^24.6.2",
+    "@types/react": "^19.2.0",
+    "bootstrap": "^5.3.8",
+    "next": "^15.5.4",
+    "react": "^19.2.0",
+    "react-bootstrap": "^2.10.10",
+    "react-dom": "^19.2.0",
+    "typescript": "^5.9.3",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.14",
+    "@types/react-dom": "^19.2.0",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9.37.0",
+    "eslint-config-next": "^15.5.4",
+    "postcss": "^8.5.6",
+    "prisma": "^6.16.3",
+    "tailwindcss": "^4.1.14",
+    "ts-node": "^10.9.2"
+  },
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+  }
+}
