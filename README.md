@@ -83,65 +83,44 @@
 ### 步驟 2：下載專案
 
 1. **下載專案壓縮檔**
-
    - 前往專案頁面：https://github.com/c30541/WorkSchedule
    - 點擊綠色的 "Code" 按鈕
    - 選擇 "Download ZIP"
    - 等待下載完成
 
 2. **解壓縮專案**
-
    - 找到下載的 `WorkSchedule-main.zip` 檔案
    - 在檔案上按右鍵，選擇「解壓縮全部」
    - 選擇解壓縮位置（例如：`C:\Projects\`）
    - 解壓縮完成後，開啟資料夾
 
-3. **開啟命令提示字元或 PowerShell**
-
-   - 在解壓縮後的專案資料夾中
-   - 按住 Shift 鍵 + 滑鼠右鍵
-   - 選擇「在此處開啟 PowerShell 視窗」或「在此處開啟命令視窗」
-
-   _或者使用傳統方式：_
-
-   ```bash
-   cd C:\Projects\WorkSchedule-main
-   ```
-
 ### 步驟 3：啟動專案
 
-1. **使用 Docker Compose 啟動服務**
+**方法一：使用自動啟動腳本（推薦）**
 
+1. 在專案資料夾中找到 `start.bat` 檔案
+2. 雙擊執行 `start.bat`
+3. 腳本會自動：
+   - ✓ 檢查 Docker 是否已安裝
+   - ✓ 檢查 Docker Compose 是否已安裝
+   - ✓ 啟動所有服務
+   - ✓ 顯示訪問網址
+
+**方法二：手動啟動**
+
+1. **開啟命令提示字元或 PowerShell**
+   - 在專案資料夾中按住 Shift 鍵 + 滑鼠右鍵
+   - 選擇「在此處開啟 PowerShell 視窗」
+
+2. **執行啟動指令**
    ```bash
    docker-compose up -d
    ```
 
-   - `-d` 參數表示在背景執行
-   - 第一次啟動會自動執行以下動作：
-     - 下載所需的 Docker 映像檔（可能需要 5-10 分鐘）
-     - 建立並啟動 PostgreSQL 資料庫
-     - 建置應用程式
-     - 自動執行資料庫遷移
-     - 啟動 Next.js 應用程式
-   - 環境變數已預先設定在 `docker-compose.yml` 中，無需手動配置
-
-2. **（選用）建立測試資料**
-
-   如果想要建立一些測試用的員工與班表資料：
-
-   ```bash
-   docker-compose exec app npm run db:seed
-   ```
-
-3. **查看啟動狀態**
-
-   確認所有服務都已正常啟動：
-
-   ```bash
-   docker-compose ps
-   ```
-
-   應該會看到兩個服務都處於 `running` 狀態。
+**啟動說明：**
+- 第一次啟動會自動下載 Docker 映像檔（約 5-10 分鐘）
+- 自動執行資料庫遷移
+- 環境變數已預先配置，無需手動設定
 
 ### 步驟 4：訪問系統
 
@@ -151,49 +130,53 @@
 - **班表管理**：http://localhost:3000/schedule
 - **員工管理**：http://localhost:3000/employees
 
-## macOS / Linux 安裝指南
+## macOS / Linux 快速安裝
 
-### 安裝 Docker Desktop
+### macOS
 
-**macOS:**
+1. **安裝 Docker Desktop**
+   - 下載：https://www.docker.com/products/docker-desktop/
+   - 選擇對應版本（Intel 或 Apple Silicon）
+   - 將 Docker.app 拖曳到應用程式資料夾
+   - 啟動 Docker Desktop
 
-1. 前往 https://www.docker.com/products/docker-desktop/
-2. 下載 macOS 版本（Intel 或 Apple Silicon）
-3. 將 Docker.app 拖曳到應用程式資料夾
-4. 啟動 Docker Desktop
+2. **下載並啟動專案**
+   ```bash
+   # 下載專案
+   curl -L https://github.com/c30541/WorkSchedule/archive/refs/heads/main.zip -o WorkSchedule.zip
+   unzip WorkSchedule.zip
+   cd WorkSchedule-main
 
-**Linux:**
+   # 啟動服務
+   docker-compose up -d
+   ```
 
-```bash
-# Ubuntu/Debian
-sudo apt-get update
-sudo apt-get install docker.io docker-compose
+### Linux
 
-# Fedora
-sudo dnf install docker docker-compose
+1. **安裝 Docker**
+   ```bash
+   # Ubuntu/Debian
+   sudo apt-get update
+   sudo apt-get install docker.io docker-compose
 
-# 啟動 Docker 服務
-sudo systemctl start docker
-sudo systemctl enable docker
-```
+   # 啟動 Docker 服務
+   sudo systemctl start docker
+   sudo systemctl enable docker
+   ```
 
-### 啟動專案
+2. **下載並啟動專案**
+   ```bash
+   # 下載專案
+   wget https://github.com/c30541/WorkSchedule/archive/refs/heads/main.zip
+   unzip main.zip
+   cd WorkSchedule-main
 
-```bash
-# 下載專案 ZIP 並解壓縮，或使用 git clone
-git clone https://github.com/c30541/WorkSchedule.git
-cd WorkSchedule
+   # 啟動服務
+   docker-compose up -d
+   ```
 
-# 使用 Docker Compose 啟動（環境變數已內建）
-docker-compose up -d
-
-# （選用）建立測試資料
-docker-compose exec app npm run db:seed
-```
-
-訪問 http://localhost:3000
-
-**註：** 環境變數已預先配置在 `docker-compose.yml` 中，無需手動設定。
+3. **訪問系統**
+   - http://localhost:3000
 
 ## 使用說明
 
@@ -273,86 +256,81 @@ docker-compose exec app npm run db:seed
 - **休假**：紅色方塊，白色「休」字
 - **工時顯示**：班次時間下方的藍色標籤（如：8.0h）
 
-## 常用指令
+## 常用操作
+
+### 啟動與停止
 
 ```bash
-# 啟動服務
+# 啟動服務（Windows 使用者可直接執行 start.bat）
 docker-compose up -d
 
 # 停止服務
 docker-compose down
 
-# 查看日誌
+# 查看服務狀態
+docker-compose ps
+```
+
+### 查看日誌
+
+```bash
+# 查看所有服務日誌
+docker-compose logs -f
+
+# 只查看應用程式日誌
 docker-compose logs -f app
 
-# 重新建置並啟動
+# 只查看資料庫日誌
+docker-compose logs -f db
+```
+
+### 重新啟動
+
+```bash
+# 重新啟動所有服務
+docker-compose restart
+
+# 重新建置並啟動（當程式碼有更新時）
 docker-compose up -d --build
+```
 
-# 進入應用程式容器
-docker-compose exec app sh
+### 資料庫操作
 
-# 執行 Prisma 指令
-docker-compose exec app npx prisma studio  # 開啟資料庫管理介面
-docker-compose exec app npx prisma migrate dev  # 建立新的遷移
+```bash
+# 開啟資料庫管理介面（Prisma Studio）
+docker-compose exec app npx prisma studio
+# 然後訪問 http://localhost:5555
 
-# 重設資料庫
+# 建立測試資料
+docker-compose exec app npm run db:seed
+
+# 重設資料庫（會清空所有資料）
 docker-compose exec app npx prisma migrate reset
 ```
 
-## 開發模式
+## 進階：本機開發模式
 
-如果要在本地開發而不使用 Docker（進階使用者）：
-
-1. **安裝依賴**
-
-   ```bash
-   npm install
-   # 或
-   pnpm install
-   ```
-
-2. **使用 Docker Compose 啟動資料庫**
-
-   ```bash
-   docker-compose up -d db
-   ```
-
-3. **建立 `.env` 檔案**
-
-   在專案根目錄建立 `.env` 檔案：
-
-   ```env
-   DATABASE_URL="postgresql://prisma:prisma@localhost:5432/schedule?schema=public"
-   ```
-
-4. **執行資料庫遷移**
-
-   ```bash
-   npx prisma migrate dev
-   npx prisma generate
-   ```
-
-5. **啟動開發伺服器**
-
-   ```bash
-   npm run dev
-   ```
-
-6. **訪問開發環境**
-
-   http://localhost:3000
-
-**註：** 生產環境建議使用 Docker Compose 完整啟動，開發模式僅適用於需要修改程式碼的情況。
-
-## 資料庫管理
-
-使用 Prisma Studio 管理資料庫：
+> 僅供需要修改程式碼的開發者使用，一般使用者請使用 Docker Compose
 
 ```bash
-docker-compose exec app npx prisma studio
+# 1. 安裝依賴
+npm install
+
+# 2. 啟動資料庫
+docker-compose up -d db
+
+# 3. 建立 .env 檔案
+echo 'DATABASE_URL="postgresql://prisma:prisma@localhost:5432/schedule?schema=public"' > .env
+
+# 4. 執行資料庫遷移
+npx prisma migrate dev
+npx prisma generate
+
+# 5. 啟動開發伺服器
+npm run dev
 ```
 
-開啟瀏覽器訪問 http://localhost:5555
+訪問 http://localhost:3000
 
 ## 故障排除
 
