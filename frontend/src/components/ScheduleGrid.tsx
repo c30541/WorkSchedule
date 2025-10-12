@@ -20,6 +20,7 @@ interface Shift {
   duration: number;
   note?: string;
   isLeave?: boolean;
+  isDouble?: boolean;
 }
 
 interface Holiday {
@@ -172,7 +173,9 @@ export default function ScheduleGrid({
       .reduce((total, shift) => {
         // 若工時為9小時，扣除1小時休息時間
         const actualHours = shift.duration === 9 ? 8 : shift.duration;
-        return total + actualHours;
+        // 若為雙薪，則乘以2
+        const calculatedHours = shift.isDouble ? actualHours * 2 : actualHours;
+        return total + calculatedHours;
       }, 0);
   };
 
@@ -187,7 +190,9 @@ export default function ScheduleGrid({
       .reduce((total, shift) => {
         // 若工時為9小時，扣除1小時休息時間
         const actualHours = shift.duration === 9 ? 8 : shift.duration;
-        return total + actualHours;
+        // 若為雙薪，則乘以2
+        const calculatedHours = shift.isDouble ? actualHours * 2 : actualHours;
+        return total + calculatedHours;
       }, 0);
   };
 

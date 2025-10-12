@@ -1,6 +1,6 @@
-import type { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/lib/prisma";
 import { calcDuration } from "@/lib/utils";
+import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
   req: NextApiRequest,
@@ -38,7 +38,7 @@ export default async function handler(
     }
   } else if (req.method === "POST") {
     try {
-      const { employeeId, date, startTime, endTime, note, isLeave } = req.body;
+      const { employeeId, date, startTime, endTime, note, isLeave, isDouble } = req.body;
 
       if (!employeeId || !date || startTime === undefined || endTime === undefined) {
         return res.status(400).json({
@@ -57,6 +57,7 @@ export default async function handler(
           duration,
           note,
           isLeave: isLeave || false,
+          isDouble: isDouble || false,
         },
         include: {
           employee: true,

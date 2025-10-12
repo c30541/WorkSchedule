@@ -12,6 +12,7 @@ interface Shift {
   duration: number;
   note?: string;
   isLeave?: boolean;
+  isDouble?: boolean;
 }
 
 interface ShiftCellProps {
@@ -54,6 +55,12 @@ export default function ShiftCell({
     return duration === 9 ? 8 : duration;
   };
 
+  // 計算統計用工時（雙倍時數 x 2）
+  const getCalculatedHours = (duration: number, isDouble: boolean): number => {
+    const actualHours = getActualHours(duration);
+    return isDouble ? actualHours * 2 : actualHours;
+  };
+
   console.log(
     "ShiftCell rendering - cellKey:",
     cellKey,
@@ -89,8 +96,12 @@ export default function ShiftCell({
                 <div className="fw-semibold">
                   {formatTimeRange(shift.startTime, shift.endTime)}
                 </div>
-                <div className="badge bg-info text-dark" style={{ fontSize: "0.7rem" }}>
+                <div
+                  className="badge bg-info text-dark"
+                  style={{ fontSize: "0.7rem" }}
+                >
                   {getActualHours(shift.duration).toFixed(1)}h
+                  {shift.isDouble ? "(雙薪)" : ""}
                 </div>
               </>
             )}

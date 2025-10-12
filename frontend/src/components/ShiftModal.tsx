@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { createPortal } from "react-dom";
 import { formatDate } from "@/lib/utils";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 interface Shift {
   id: number;
@@ -13,6 +13,7 @@ interface Shift {
   duration: number;
   note?: string;
   isLeave?: boolean;
+  isDouble?: boolean;
 }
 
 interface ShiftModalProps {
@@ -41,6 +42,7 @@ export default function ShiftModal({
     endMinute: "00",
     note: "",
     isLeave: false,
+    isDouble: false,
   });
 
   useEffect(() => {
@@ -66,6 +68,7 @@ export default function ShiftModal({
           endMinute: endMinute.toString().padStart(2, "0"),
           note: shift.note || "",
           isLeave: shift.isLeave || false,
+          isDouble: shift.isDouble || false,
         });
       } else {
         console.log("Creating new shift");
@@ -76,6 +79,7 @@ export default function ShiftModal({
           endMinute: "00",
           note: "",
           isLeave: false,
+          isDouble: false,
         });
       }
     }
@@ -113,6 +117,7 @@ export default function ShiftModal({
       endTime,
       note: formData.note || null,
       isLeave: formData.isLeave,
+      isDouble: formData.isDouble,
     };
 
     try {
@@ -147,20 +152,26 @@ export default function ShiftModal({
   };
 
   if (!isOpen || !mounted) {
-    console.log("ShiftModal not rendering - isOpen:", isOpen, "mounted:", mounted);
+    console.log(
+      "ShiftModal not rendering - isOpen:",
+      isOpen,
+      "mounted:",
+      mounted
+    );
     return null;
   }
 
   console.log("ShiftModal rendering portal");
 
   return createPortal(
-    <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+    <div
+      className="modal show d-block"
+      style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+    >
       <div className="modal-dialog modal-dialog-centered">
         <div className="modal-content">
           <div className="modal-header">
-            <h5 className="modal-title">
-              {shift ? "編輯班次" : "新增班次"}
-            </h5>
+            <h5 className="modal-title">{shift ? "編輯班次" : "新增班次"}</h5>
             <button
               type="button"
               className="btn-close"
@@ -183,14 +194,41 @@ export default function ShiftModal({
                   id="isLeaveCheck"
                   checked={formData.isLeave}
                   onChange={(e) => {
-                    setFormData({ ...formData, isLeave: e.target.checked });
+                    setFormData({
+                      ...formData,
+                      isLeave: e.target.checked,
+                      isDouble: e.target.checked ? false : formData.isDouble, // 勾選休假時取消雙薪
+                    });
                     setErrorMessage(""); // 清除錯誤訊息
                   }}
                 />
-                <label className="form-check-label fw-semibold" htmlFor="isLeaveCheck">
+                <label
+                  className="form-check-label fw-semibold"
+                  htmlFor="isLeaveCheck"
+                >
                   休假
                 </label>
               </div>
+              {!formData.isLeave && (
+                <div className="form-check">
+                  <input
+                    type="checkbox"
+                    className="form-check-input"
+                    id="isDoubleCheck"
+                    checked={formData.isDouble}
+                    onChange={(e) => {
+                      setFormData({ ...formData, isDouble: e.target.checked });
+                      setErrorMessage(""); // 清除錯誤訊息
+                    }}
+                  />
+                  <label
+                    className="form-check-label fw-semibold"
+                    htmlFor="isDoubleCheck"
+                  >
+                    雙薪
+                  </label>
+                </div>
+              )}
             </div>
 
             {!formData.isLeave && (
@@ -203,7 +241,7 @@ export default function ShiftModal({
                       min="0"
                       max="23"
                       className="form-control"
-                      style={{ width: '80px' }}
+                      style={{ width: "80px" }}
                       value={formData.startHour}
                       onChange={(e) =>
                         setFormData({ ...formData, startHour: e.target.value })
@@ -213,10 +251,13 @@ export default function ShiftModal({
                     <span>:</span>
                     <select
                       className="form-select"
-                      style={{ width: '80px' }}
+                      style={{ width: "80px" }}
                       value={formData.startMinute}
                       onChange={(e) =>
-                        setFormData({ ...formData, startMinute: e.target.value })
+                        setFormData({
+                          ...formData,
+                          startMinute: e.target.value,
+                        })
                       }
                     >
                       <option value="00">00</option>
@@ -234,7 +275,7 @@ export default function ShiftModal({
                       min="0"
                       max="23"
                       className="form-control"
-                      style={{ width: '80px' }}
+                      style={{ width: "80px" }}
                       value={formData.endHour}
                       onChange={(e) =>
                         setFormData({ ...formData, endHour: e.target.value })
@@ -244,7 +285,7 @@ export default function ShiftModal({
                     <span>:</span>
                     <select
                       className="form-select"
-                      style={{ width: '80px' }}
+                      style={{ width: "80px" }}
                       value={formData.endMinute}
                       onChange={(e) =>
                         setFormData({ ...formData, endMinute: e.target.value })

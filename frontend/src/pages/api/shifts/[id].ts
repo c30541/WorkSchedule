@@ -1,6 +1,6 @@
-import type { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/lib/prisma";
 import { calcDuration } from "@/lib/utils";
+import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
   req: NextApiRequest,
@@ -31,7 +31,7 @@ export default async function handler(
     }
   } else if (req.method === "PUT") {
     try {
-      const { date, startTime, endTime, note, isLeave } = req.body;
+      const { date, startTime, endTime, note, isLeave, isDouble } = req.body;
 
       const duration =
         startTime !== undefined && endTime !== undefined
@@ -45,6 +45,7 @@ export default async function handler(
       if (duration !== undefined) updateData.duration = duration;
       if (note !== undefined) updateData.note = note;
       if (isLeave !== undefined) updateData.isLeave = isLeave;
+      if (isDouble !== undefined) updateData.isDouble = isDouble;
 
       const shift = await prisma.shift.update({
         where: { id: shiftId },

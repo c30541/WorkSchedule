@@ -1,5 +1,5 @@
-import type { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/lib/prisma";
+import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
   req: NextApiRequest,
@@ -29,7 +29,14 @@ export default async function handler(
       },
     });
 
-    const totalHours = shifts.reduce((sum, shift) => sum + shift.duration, 0);
+    // 計算統計用工時（考慮雙倍工時）
+    const getCalculatedHours = (shift: any): number => {
+      // 如果是9小時則扣除1小時休息時間，然後考慮雙倍
+      const actualHours = shift.duration === 9 ? 8 : shift.duration;
+      return shift.isDouble ? actualHours * 2 : actualHours;
+    };
+
+    const totalHours = shifts.reduce((sum, shift) => sum + getCalculatedHours(shift), 0);
 
     const employeeHoursMap = new Map<
       number,
@@ -37,14 +44,15 @@ export default async function handler(
     >();
 
     shifts.forEach((shift) => {
+      const calculatedHours = getCalculatedHours(shift);
       const existing = employeeHoursMap.get(shift.employeeId);
       if (existing) {
-        existing.hours += shift.duration;
+        existing.hours += calculatedHours;
       } else {
         employeeHoursMap.set(shift.employeeId, {
           employeeId: shift.employeeId,
           name: shift.employee.name,
-          hours: shift.duration,
+          hours: calculatedHours,
         });
       }
     });

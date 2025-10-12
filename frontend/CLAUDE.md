@@ -25,6 +25,7 @@
 5. 每人每日總工時顯示；亦可按週/月預覽總時數。
 6. 提供統計（選定時間範圍）下：全部員工總時數，以及依員工拆分的時數。
 7. 日期顏色規則：一般日淺灰、一般假日深灰、國定假日黃色。
+8. 雙薪工時功能：班次可標記為雙薪，統計時數時會 x2 計算，顯示時會加上「(薪)」標記。當勾選休假時，雙薪選項將被隱藏。
 
 ---
 
@@ -75,6 +76,8 @@ model Shift {
   endTime    Int
   duration   Float    // 小時數，例如 7.5（可由 app 或 DB Trigger 計）
   note       String?
+  isLeave    Boolean  @default(false) // 是否為休假
+  isDouble   Boolean  @default(false) // 是否為雙薪工時
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
@@ -126,7 +129,7 @@ export function loadHolidays() {
 4. `DELETE /api/employees/:id` — 刪除員工
 
 5. `GET /api/shifts?start=YYYYMMDD&end=YYYYMMDD` — 取得指定日期區間的班表（含 employee 資料與 duration）
-6. `POST /api/shifts` — 建立班次（body: employeeId, date, startTime, endTime, note）
+6. `POST /api/shifts` — 建立班次（body: employeeId, date, startTime, endTime, note, isLeave, isDouble）
 7. `PUT /api/shifts/:id` — 更新
 8. `DELETE /api/shifts/:id` — 刪除
 
@@ -192,8 +195,9 @@ export function loadHolidays() {
 
 - 使用 24 小時制的時間選單（select）或可輸入的時間範圍控制（例如 `start` 下拉 + `end` 下拉）。
 - 支援分鐘精度（可選 00/15/30/45）或只用整點，視需求決定。
-- 編輯流程：點擊 cell -> 出現小型編輯器（start, end, note）-> 儲存（呼叫 API）-> 更新 UI。
+- 編輯流程：點擊 cell -> 出現小型編輯器（start, end, note, 休假, 雙薪）-> 儲存（呼叫 API）-> 更新 UI。
 - 立即在 UI 計算該日/週/月份的工時與顯示（同時由 API 返回 duration 作為確認）。
+- 雙薪工時選項：勾選後統計計算時會將工時乘以 2，並在顯示時加上「(薪)」標記。當勾選休假時，雙薪選項會被隱藏且自動取消勾選。
 
 ---
 
@@ -201,8 +205,10 @@ export function loadHolidays() {
 
 - 由 API（`/api/statistics`）計算：
   1. 依 `start`、`end` 範圍抓取 shifts
-  2. sum(duration) 為 `totalHours`
-  3. group by employeeId sum(duration) 為 `byEmployee`
+  2. 計算實際工時：若 duration = 9 則實際工時 = 8（扣除休息時間），否則實際工時 = duration
+  3. 計算統計工時：若 isDouble = true 則統計工時 = 實際工時 x 2，否則統計工時 = 實際工時
+  4. sum(統計工時) 為 `totalHours`
+  5. group by employeeId sum(統計工時) 為 `byEmployee`
 
 SQL/Prisma 範例（概念）
 
@@ -216,7 +222,51 @@ const totals = await prisma.shift.groupBy({
 
 ---
 
-## 11. 進階：週數推算與左右移動
+## 11. 雙薪工時功能詳細說明
+
+### 11.1 功能概要
+
+- 雙薪工時是一個可選的班次屬性，用於標記需要雙薪計算工時的班次（例如加班、特殊津貼等）
+- 在 ShiftModal 中，「雙薪」選項位於「休假」選項下方，但只在非休假狀態時顯示
+- 當勾選休假時，雙薪選項會被隱藏且自動取消勾選
+- 當班次標記為雙薪時，統計計算會將實際工時乘以 2
+- 在 ShiftCell 顯示時會在工時後方加上「(薪)」標記
+
+### 11.2 UI 變更
+
+- **ShiftModal**：在休假 checkbox 下方增加雙薪 checkbox，但只在非休假狀態時顯示
+- **ShiftCell**：時數顯示格式由 `8.0h` 改為 `8.0h(薪)`（當 isDouble = true 時）
+
+### 11.3 資料庫變更
+
+- Shift 模型新增 `isDouble` Boolean 欄位，預設為 false
+- 遷移檔案：`20251012130643_add_is_double_to_shift`
+
+### 11.4 API 變更
+
+- `POST /api/shifts` 和 `PUT /api/shifts/:id` 支援 `isDouble` 參數
+- `/api/statistics` 統計計算邏輯更新：
+  - 實際工時 = (duration === 9) ? 8 : duration
+  - 統計工時 = isDouble ? (實際工時 × 2) : 實際工時
+
+### 11.5 計算邏輯
+
+```typescript
+// 計算實際工時（扣除休息時間）
+const getActualHours = (duration: number): number => {
+  return duration === 9 ? 8 : duration;
+};
+
+// 計算統計用工時（雙薪時數 × 2）
+const getCalculatedHours = (duration: number, isDouble: boolean): number => {
+  const actualHours = getActualHours(duration);
+  return isDouble ? actualHours * 2 : actualHours;
+};
+```
+
+---
+
+## 12. 進階：週數推算與左右移動
 
 - 使用者可選擇要顯示的週數 `N`（例如 1, 2, 4）
 - 畫面預設以當前日期為中心或當月第一天為起點（需求中以「依照當下日期來推算週數」）
@@ -226,7 +276,7 @@ const totals = await prisma.shift.groupBy({
 
 ---
 
-## 12. Docker 與啟動範例
+## 13. Docker 與啟動範例
 
 **docker-compose.yml 範例（重點）**
 
@@ -264,19 +314,19 @@ volumes:
 
 ---
 
-## 13. 資料遷移與種子資料（seed）
+## 14. 資料遷移與種子資料（seed）
 
 - 建議建立 `prisma/seed.ts`：載入範例員工、載入 `data/2025.json` 中的假日作測試（或僅載入員工與部分 shifts）。
 
 ---
 
-## 14. 權限與驗證
+## 15. 權限與驗證
 
 - 無需權限與驗證
 
 ---
 
-## 15. 測試項目（建議）
+## 16. 測試項目（建議）
 
 - 單元測試：Prisma 的 CRUD（create/update/delete shifts/employees）
 - 顯示測試：ScheduleGrid 在不同週數與月份下的行為
@@ -284,13 +334,13 @@ volumes:
 
 ---
 
-## 16. 開發時程
+## 17. 開發時程
 
 - 無需控制開發時程
 
 ---
 
-## 17. 範例程式片段
+## 18. 範例程式片段
 
 ### 計算 duration（Node）
 
@@ -321,7 +371,7 @@ export default async function handler(req, res) {
 
 ---
 
-## 18. 注意事項與建議
+## 19. 注意事項與建議
 
 1. 儲存時間格式時請一致（決定使用 HHMM 或 小時浮點數），避免前後轉換差異。
 2. 假日 JSON 若維護頻繁，考慮改由管理後台上傳或接一個小服務以便年度更新。
@@ -329,7 +379,7 @@ export default async function handler(req, res) {
 
 ---
 
-## 19. 補充：Excel-like 匯出格式範例
+## 20. 補充：Excel-like 匯出格式範例
 
 - 左側員工名稱列、上方日期列，儲存格為 `start-end`。
 - 匯出時可帶上 `duration` 與 `note` 欄位於隱藏欄以利報表分析。
