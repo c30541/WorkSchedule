@@ -35,18 +35,10 @@ export default function ShiftCell({
   onEditingChange,
 }: ShiftCellProps) {
   const handleClick = () => {
-    console.log(
-      "ShiftCell clicked - cellKey:",
-      cellKey,
-      "current isEditing:",
-      isEditing
-    );
     onEditingChange(cellKey, true);
-    console.log("After onEditingChange, setting to true");
   };
 
   const handleClose = () => {
-    console.log("ShiftModal closing - cellKey:", cellKey);
     onEditingChange(cellKey, false);
   };
 
@@ -60,13 +52,6 @@ export default function ShiftCell({
     const actualHours = getActualHours(duration);
     return isDouble ? actualHours * 2 : actualHours;
   };
-
-  console.log(
-    "ShiftCell rendering - cellKey:",
-    cellKey,
-    "isEditing:",
-    isEditing
-  );
 
   return (
     <>

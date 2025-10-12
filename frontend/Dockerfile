@@ -50,4 +50,15 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["node", "server.js"]
+# Create startup script that runs migrations before starting the server
+COPY --chown=nextjs:nodejs <<EOF /app/start.sh
+#!/bin/sh
+echo "Running database migrations..."
+npx prisma migrate deploy
+echo "Starting application..."
+exec node server.js
+EOF
+
+RUN chmod +x /app/start.sh
+
+CMD ["/app/start.sh"]

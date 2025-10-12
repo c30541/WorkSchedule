@@ -16,10 +16,13 @@ model Employee {
   title      String?
   hourlyWage Decimal? @db.Decimal(10, 2)
   note       String?
+  sortOrder  Int      @default(0) // 員工排序順序
   isActive   Boolean  @default(true) // 在職狀態
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   shifts     Shift[]
+
+  @@index([sortOrder])
 }
 
 model Shift {

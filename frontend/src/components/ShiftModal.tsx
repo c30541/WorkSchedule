@@ -47,15 +47,12 @@ export default function ShiftModal({
 
   useEffect(() => {
     setMounted(true);
-    console.log("ShiftModal mounted");
   }, []);
 
   useEffect(() => {
-    console.log("ShiftModal isOpen changed:", isOpen);
     if (isOpen) {
       setErrorMessage(""); // 清除錯誤訊息
       if (shift) {
-        console.log("Editing existing shift:", shift);
         const startHour = Math.floor(shift.startTime / 100);
         const startMinute = shift.startTime % 100;
         const endHour = Math.floor(shift.endTime / 100);
@@ -71,7 +68,6 @@ export default function ShiftModal({
           isDouble: shift.isDouble || false,
         });
       } else {
-        console.log("Creating new shift");
         setFormData({
           startHour: "",
           startMinute: "00",
@@ -86,8 +82,6 @@ export default function ShiftModal({
   }, [isOpen, shift]);
 
   const handleSave = async () => {
-    console.log("Saving shift...", formData);
-
     // 如果是休假，設定預設時間為 0
     const startTime = formData.isLeave
       ? 0
@@ -152,16 +146,8 @@ export default function ShiftModal({
   };
 
   if (!isOpen || !mounted) {
-    console.log(
-      "ShiftModal not rendering - isOpen:",
-      isOpen,
-      "mounted:",
-      mounted
-    );
     return null;
   }
-
-  console.log("ShiftModal rendering portal");
 
   return createPortal(
     <div

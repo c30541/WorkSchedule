@@ -8,6 +8,7 @@ import ShiftCell from "./ShiftCell";
 interface Employee {
   id: number;
   name: string;
+  sortOrder: number;
   isActive?: boolean;
 }
 
@@ -154,15 +155,7 @@ export default function ScheduleGrid({
 
   const handleEditingChange = useCallback(
     (cellKey: string, editing: boolean) => {
-      console.log(
-        "ScheduleGrid handleEditingChange - cellKey:",
-        cellKey,
-        "editing:",
-        editing
-      );
-      console.log("Previous editingCell:", editingCell);
       setEditingCell(editing ? cellKey : null);
-      console.log("New editingCell will be:", editing ? cellKey : null);
     },
     [editingCell]
   );
@@ -197,8 +190,10 @@ export default function ScheduleGrid({
   };
 
   const handleExportExcel = () => {
-    // 只匯出在職員工
-    const activeEmployees = employees.filter((emp) => emp.isActive !== false);
+    // 只匯出在職員工，並依排序順序排列
+    const activeEmployees = employees
+      .filter((emp) => emp.isActive !== false)
+      .sort((a, b) => a.sortOrder - b.sortOrder);
 
     // 準備表頭
     const headers = [
@@ -286,6 +281,7 @@ export default function ScheduleGrid({
         <tbody>
           {employees
             .filter((employee) => employee.isActive !== false)
+            .sort((a, b) => a.sortOrder - b.sortOrder)
             .map((employee) => (
               <tr key={employee.id}>
                 <td
@@ -331,6 +327,7 @@ export default function ScheduleGrid({
               <tbody>
                 {employees
                   .filter((employee) => employee.isActive !== false)
+                  .sort((a, b) => a.sortOrder - b.sortOrder)
                   .map((employee) => {
                     const totalHours = calculateTotalHours(employee.id);
                     return (

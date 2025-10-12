@@ -1,5 +1,5 @@
-import type { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/lib/prisma";
+import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
   req: NextApiRequest,
@@ -8,7 +8,10 @@ export default async function handler(
   if (req.method === "GET") {
     try {
       const employees = await prisma.employee.findMany({
-        orderBy: { name: "asc" },
+        orderBy: [
+          { sortOrder: "asc" },
+          { name: "asc" }
+        ],
       });
       res.status(200).json(employees);
     } catch (error) {
@@ -17,7 +20,7 @@ export default async function handler(
     }
   } else if (req.method === "POST") {
     try {
-      const { name, title, hourlyWage, note, isActive } = req.body;
+      const { name, title, hourlyWage, note, isActive, sortOrder } = req.body;
 
       if (!name) {
         return res.status(400).json({ error: "name is required" });
@@ -30,6 +33,7 @@ export default async function handler(
           hourlyWage,
           note,
           isActive: isActive ?? true,
+          sortOrder: sortOrder ?? 0,
         },
       });
 
