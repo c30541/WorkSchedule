@@ -83,6 +83,7 @@
 ### 步驟 2：下載專案
 
 1. **下載專案壓縮檔**
+
    - 前往專案頁面：https://github.com/c30541/WorkSchedule
    - 點擊綠色的 "Code" 按鈕
    - 選擇 "Download ZIP"
@@ -109,6 +110,7 @@
 **方法二：手動啟動**
 
 1. **開啟命令提示字元或 PowerShell**
+
    - 在專案資料夾中按住 Shift 鍵 + 滑鼠右鍵
    - 選擇「在此處開啟 PowerShell 視窗」
 
@@ -118,6 +120,7 @@
    ```
 
 **啟動說明：**
+
 - 第一次啟動會自動下載 Docker 映像檔（約 5-10 分鐘）
 - 自動執行資料庫遷移
 - 環境變數已預先配置，無需手動設定
@@ -135,12 +138,14 @@
 ### macOS
 
 1. **安裝 Docker Desktop**
+
    - 下載：https://www.docker.com/products/docker-desktop/
    - 選擇對應版本（Intel 或 Apple Silicon）
    - 將 Docker.app 拖曳到應用程式資料夾
    - 啟動 Docker Desktop
 
 2. **下載並啟動專案**
+
    ```bash
    # 下載專案
    curl -L https://github.com/c30541/WorkSchedule/archive/refs/heads/main.zip -o WorkSchedule.zip
@@ -154,6 +159,7 @@
 ### Linux
 
 1. **安裝 Docker**
+
    ```bash
    # Ubuntu/Debian
    sudo apt-get update
@@ -165,6 +171,7 @@
    ```
 
 2. **下載並啟動專案**
+
    ```bash
    # 下載專案
    wget https://github.com/c30541/WorkSchedule/archive/refs/heads/main.zip
@@ -299,21 +306,11 @@ docker-compose up -d --build
 當專案有程式更新時，建議執行以下步驟以確保完整更新：
 
 **Windows 使用者：**
-1. 雙擊執行 `clean-docker.bat`
-2. 確認刪除提示後輸入 `Y`
-3. 等待清理完成
+
+1. 移除舊的 frontend 資料夾及裡面的檔案
+2. 下載新的檔案，會變更的就只有 frontend 這個資料夾內的檔案，為了避免有舊檔案留存，因此必須執行第一步，將舊的資料夾完整刪除後，才能進行第三步驟
+3. 將新的檔案內的「frontend」複製到舊的資料夾內
 4. 雙擊執行 `start.bat` 重新啟動服務
-
-**macOS / Linux 使用者：**
-```bash
-# 停止並刪除容器、映像、卷
-docker-compose down -v
-docker rmi $(docker images -q)
-docker volume prune -f
-
-# 重新啟動服務
-docker-compose up -d --build
-```
 
 ### 資料庫操作
 
